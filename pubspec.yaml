@@ -1,6 +1,6 @@
 name: paper_3d
 description: A faux 3d asset rendering utility for flutter based on Stack, Container and Transformation Widgets.
-version: 1.0.0
+version: 1.0.1
 repository: https://github.com/Zira-Games/paper-3d
 homepage: https://github.com/Zira-Games/paper-3d
 
