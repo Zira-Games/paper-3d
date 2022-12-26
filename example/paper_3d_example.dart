@@ -31,7 +31,7 @@ class World extends StatelessWidget {
       background: Color(0xFFFFFFFF),
       camera: cameraSubject,
       screen: screenSubject,
-      declaredAssets: [
+      assets: [
         AwesomeAsset(Uuid().v4(), screenSize, tickerManager)
       ]
     );

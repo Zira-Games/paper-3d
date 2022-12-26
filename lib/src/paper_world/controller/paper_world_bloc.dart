@@ -12,9 +12,19 @@ part 'paper_world_state.dart';
 
 class PaperWorldBloc extends Bloc<GameWorldEvent, GameWorldState> {
 
-  final List<WorldAsset> declaredAssets;
+  static getInitialState(List<WorldAsset> assets) => {
+    for(final asset in assets)
+      if( asset.controller.state is WorldAssetLoaded )
+        asset.id: asset.controller.state.order,
+  };
 
-  PaperWorldBloc(this.declaredAssets) : super(const GameWorldState({})) {
+  final List<WorldAsset> assets;
+
+  PaperWorldBloc(this.assets) : super(GameWorldState(getInitialState(assets))) {
+    for( final asset in assets ){
+      asset.controller.paperWorld = this;
+    }
+
     on<AddAsset>(_onAddAsset);
     on<RemoveAsset>(_onRemoveAssets);
     on<UpdateAssetOrder>(_onUpdateAssetOrder);
@@ -22,12 +32,6 @@ class PaperWorldBloc extends Bloc<GameWorldEvent, GameWorldState> {
     on<NotReady>(_onNotReady);
 
     add(const Ready());
-    for(final asset in declaredAssets){
-      asset.controller.paperWorld = this;
-      if(asset.controller.state is WorldAssetLoaded){
-        add(AddAsset(asset.id, asset.controller.state.order));
-      }
-    }
   }
 
   FutureOr<void> _onAddAsset(AddAsset event, Emitter<GameWorldState> emit) {
@@ -64,7 +68,7 @@ class PaperWorldBloc extends Bloc<GameWorldEvent, GameWorldState> {
 
   @override
   Future<void> close() {
-    for(final asset in declaredAssets){
+    for(final asset in assets){
       asset.controller.paperWorld = null;
     }
     return super.close();
