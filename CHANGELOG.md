@@ -1,3 +1,7 @@
+## 1.0.7
+
+- UpVector parametrized.
+
 ## 1.0.6
 
 - DefaultController initialState parameter added.
