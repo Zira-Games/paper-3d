@@ -66,7 +66,7 @@ abstract class WorldAssetController<M extends WorldAssetModel> extends Bloc<Worl
 }
 
 class DefaultAssetController<M extends WorldAssetModel> extends WorldAssetController<M> {
-  DefaultAssetController(M initialModel, TickerManager manager) : super(initialModel, const WorldAssetUnloaded(0)){
+  DefaultAssetController(M initialModel, TickerManager manager, { WorldAssetState? initialControllerState }) : super(initialModel, initialControllerState ?? const WorldAssetUnloaded(0)){
     animation = DefaultAssetAnimation<M>(DefaultAssetAnimationStateMachine(blocToSubject(this), manager), initialModel).output;
   }
 }

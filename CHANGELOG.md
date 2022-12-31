@@ -1,3 +1,7 @@
+## 1.0.6
+
+- DefaultController initialState parameter added.
+
 ## 1.0.5
 
 - cubitToSubject utility added.
