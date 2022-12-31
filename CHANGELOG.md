@@ -1,3 +1,11 @@
+## 1.0.5
+
+- cubitToSubject utility added.
+
+## 1.0.4
+
+- main widget is now stateless.
+
 ## 1.0.3
 
 - world controller is now initialized with the assets synchronously.

@@ -18,9 +18,7 @@ class PaperWorldBloc extends Bloc<GameWorldEvent, GameWorldState> {
         asset.id: asset.controller.state.order,
   };
 
-  final List<WorldAsset> assets;
-
-  PaperWorldBloc(this.assets) : super(GameWorldState(getInitialState(assets))) {
+  PaperWorldBloc(List<WorldAsset> assets) : super(GameWorldState(assets, getInitialState(assets))) {
     for( final asset in assets ){
       asset.controller.paperWorld = this;
     }
@@ -35,26 +33,26 @@ class PaperWorldBloc extends Bloc<GameWorldEvent, GameWorldState> {
   }
 
   FutureOr<void> _onAddAsset(AddAsset event, Emitter<GameWorldState> emit) {
-    final pairs = <String, double>{...state.idOrderPairs};
+    final pairs = <String, double>{...state.loadedOrders};
     if ( !pairs.containsKey(event.id) ) {
       pairs[event.id] = event.order;
-      emit(state.copyWith(idOrderPairs: pairs));
+      emit(state.copyWith(loadedOrders: pairs));
     }
   }
 
   FutureOr<void> _onRemoveAssets(RemoveAsset event, Emitter<GameWorldState> emit) {
-    final pairs = <String, double>{...state.idOrderPairs};
+    final pairs = <String, double>{...state.loadedOrders};
     if ( pairs.containsKey(event.id) ) {
       pairs.remove(event.id);
-      emit(state.copyWith(idOrderPairs: pairs));
+      emit(state.copyWith(loadedOrders: pairs));
     }
   }
 
   FutureOr<void> _onUpdateAssetOrder(UpdateAssetOrder event, Emitter<GameWorldState> emit) {
-    final pairs = <String, double>{...state.idOrderPairs};
+    final pairs = <String, double>{...state.loadedOrders};
     if ( pairs.containsKey(event.id) ) {
       pairs[event.id] = event.order;
-      emit(state.copyWith(idOrderPairs: pairs));
+      emit(state.copyWith(loadedOrders: pairs));
     }
   }
 
@@ -68,8 +66,8 @@ class PaperWorldBloc extends Bloc<GameWorldEvent, GameWorldState> {
 
   @override
   Future<void> close() {
-    for(final asset in assets){
-      asset.controller.paperWorld = null;
+    for (var asset in state.allAssets) {
+      asset.dispose();
     }
     return super.close();
   }

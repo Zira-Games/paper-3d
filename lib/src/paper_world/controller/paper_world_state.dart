@@ -1,34 +1,39 @@
 part of 'paper_world_bloc.dart';
 
 class GameWorldState extends Equatable {
-  final Map<String, double> idOrderPairs;
-  List<String> get assetIds => idOrderPairs.entries
+  final List<WorldAsset> allAssets;
+  final Map<String, double> loadedOrders;
+  List<String> get assetIds => loadedOrders.entries
       .sorted((a, b) => b.value.compareTo(a.value))
       .map((e) => e.key)
       .toList();
 
-  const GameWorldState(this.idOrderPairs);
+  const GameWorldState(this.allAssets, this.loadedOrders);
 
-  @override List<Object> get props => [idOrderPairs];
+  @override List<Object> get props => [allAssets, loadedOrders];
 
   GameWorldState copyWith({
-    Map<String, double>? idOrderPairs
+    List<WorldAsset>? allAssets,
+    Map<String, double>? loadedOrders
   }) => GameWorldState(
-    idOrderPairs ?? this.idOrderPairs,
+    allAssets ?? this.allAssets,
+    loadedOrders ?? this.loadedOrders,
   );
 
-  GameWorldState toInitial () => GameWorldState(idOrderPairs);
-  GameWorldReady toReady () => GameWorldReady(idOrderPairs);
+  GameWorldState toInitial () => GameWorldState(allAssets, loadedOrders);
+  GameWorldReady toReady () => GameWorldReady(allAssets, loadedOrders);
 
 }
 
 class GameWorldReady extends GameWorldState {
-  const GameWorldReady(super.idOrderPairs);
+  const GameWorldReady(super.allAssets, super.idOrderPairs);
 
   @override
   GameWorldReady copyWith({
-    Map<String, double>? idOrderPairs
+    List<WorldAsset>? allAssets,
+    Map<String, double>? loadedOrders
   }) => GameWorldReady(
-    idOrderPairs ?? this.idOrderPairs,
+    allAssets ?? this.allAssets,
+    loadedOrders ?? this.loadedOrders,
   );
 }
