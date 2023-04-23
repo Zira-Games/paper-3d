@@ -10,7 +10,6 @@ import '../../scene.dart';
 import '../animation/world_asset_model.dart';
 
 // TODO If the provided transform is a translation matrix, it is much faster to use pushOffset with the translation offset instead.
-// TODO fix z checking by putting it into angleBetween method, fix cameraAngle accordingly
 // TODO model rotations are not stable with model position. change rotation quaternions by model position maybe?
 class WorldAssetRenderModel extends Equatable {
 

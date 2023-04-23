@@ -1,3 +1,7 @@
+## 1.0.8
+
+- dep upgrade.
+
 ## 1.0.7
 
 - UpVector parametrized.
