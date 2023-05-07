@@ -17,6 +17,32 @@ class WorldAssetRenderModel extends Equatable {
   static final yAxis = Vector3(0.0, 1.0, 0.0);
   static final zAxis = Vector3(0.0, 0.0, 1.0);
 
+  final CameraModel camera;
+  final WorldAssetModel asset;
+  final Scene scene;
+
+  late final double order;
+  late final Matrix4 transformation;
+
+  WorldAssetRenderModel(this.camera, this.asset, Size screenSize)
+      : scene = Scene(screenSize, screenSize.square) {
+    final Vector3 preRotationPosition = preRotationEffectivePositionAdjustment(asset, camera.positionVector);
+    final double rotateYAdjustment = rotationYAdjustment(camera, asset, preRotationPosition);
+    final Vector3 adjustedPosition = postRotationPositionAdjustment(asset, camera.positionVector, rotateYAdjustment, preRotationPosition);
+    order = camera.positionVector.distanceTo(adjustedPosition);
+    final rotation = Quaternion.axisAngle(Quaternion.axisAngle(yAxis, -rotateYAdjustment).rotated(zAxis), asset.rotateZ) * Quaternion.axisAngle(Quaternion.axisAngle(yAxis, -rotateYAdjustment).rotated(xAxis), asset.rotateX) * Quaternion.axisAngle(yAxis, rotateYAdjustment + asset.rotateY);
+    final modelMatrix = Matrix4.compose(adjustedPosition, rotation, Vector3.all(asset.scale));
+    transformation = PointerEvent.removePerspectiveTransform(
+        scene.toFlutterCoords *
+            camera.cameraMatrix *
+            modelMatrix *
+            asset.toTranslateToCenterMatrix *
+            scene.toOpenGlCoords
+    );
+  }
+
+  @override List<Object?> get props => [camera, asset, scene, transformation, order];
+
   static double rotationYAdjustment(CameraModel camera, WorldAssetModel asset, Vector3 assetPosition){
     if( asset.looksAtTheCamera ){
       return angleBetween(camera.positionVector, assetPosition);
@@ -36,17 +62,14 @@ class WorldAssetRenderModel extends Equatable {
 
   static double cameraAngle(CameraModel camera) => angleBetween(camera.positionVector, camera.lookAtVector);
 
-  static Vector3 preRotationPositionAdjustment(WorldAssetModel asset, Vector3 cameraPosition) {
-    final tempPosition = Vector3.zero();
-    asset.position.copyInto(tempPosition);
-    if( asset.effectivePositionDistance != 0 ){
-      final angle = angleBetween(cameraPosition, asset.position);
-      final effectiveTranslation = Vector3(asset.effectivePositionDistance, 0, 0);
-      final rotatedTranslation = Quaternion.axisAngle(yAxis,-angle).rotated(effectiveTranslation);
-      final zFlip = (asset.position - cameraPosition).z > 0;
-      return tempPosition + (zFlip ? -rotatedTranslation : rotatedTranslation);
+  static Vector3 preRotationEffectivePositionAdjustment(WorldAssetModel asset, Vector3 cameraPosition) {
+    if( asset.effectivePositionDistance == 0 ) {
+      return asset.position;
     }
-    return tempPosition;
+    final angle = angleBetween(cameraPosition, asset.position);
+    final effectiveTranslation = Vector3(asset.effectivePositionDistance, 0, 0);
+    final rotatedTranslation = Quaternion.axisAngle(yAxis, -angle).rotated(effectiveTranslation);
+    return asset.position.clone() + rotatedTranslation;
   }
 
   static Vector3 postRotationPositionAdjustment(WorldAssetModel asset, Vector3 cameraPosition, double rotateYAdjustment, Vector3 assetPosition) {
@@ -56,32 +79,5 @@ class WorldAssetRenderModel extends Equatable {
       return assetPosition;
     }
   }
-
-  final CameraModel camera;
-  final WorldAssetModel asset;
-  final Scene scene;
-
-  late final double order;
-  late final Matrix4 transformation;
-
-  WorldAssetRenderModel(this.camera, this.asset, Size screenSize)
-    : scene = Scene(screenSize, screenSize.square) {
-      final Vector3 preRotationPosition = preRotationPositionAdjustment(asset, camera.positionVector);
-      final double rotateYAdjustment = rotationYAdjustment(camera, asset, preRotationPosition);
-      final Vector3 adjustedPosition = postRotationPositionAdjustment(asset, camera.positionVector, rotateYAdjustment, preRotationPosition);
-      order = camera.positionVector.distanceTo(adjustedPosition);
-      final rotation = Quaternion.axisAngle(Quaternion.axisAngle(yAxis, -rotateYAdjustment).rotated(zAxis), asset.rotateZ) * Quaternion.axisAngle(Quaternion.axisAngle(yAxis, -rotateYAdjustment).rotated(xAxis), asset.rotateX) * Quaternion.axisAngle(yAxis, rotateYAdjustment + asset.rotateY);
-      final modelMatrix = Matrix4.compose(adjustedPosition, rotation, Vector3.all(asset.scale));
-      transformation = PointerEvent.removePerspectiveTransform(
-        scene.toFlutterCoords *
-        camera.cameraMatrix *
-        modelMatrix *
-        asset.toTranslateToCenterMatrix *
-        scene.toOpenGlCoords
-      );
-  }
-
-  @override List<Object?> get props => [camera, asset, scene, transformation, order];
-
 
 }

@@ -1,3 +1,7 @@
+## 1.0.9
+
+- effective distance position adjustment is now independent of the asset angle.
+
 ## 1.0.8
 
 - dep upgrade.
