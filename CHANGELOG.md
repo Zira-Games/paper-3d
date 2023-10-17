@@ -1,3 +1,11 @@
+## 1.0.11
+
+- Don't render models if they are behind the camera
+
+## 1.0.10
+
+- WorldAsset made generic
+
 ## 1.0.9
 
 - effective distance position adjustment is now independent of the asset angle.

@@ -22,6 +22,7 @@ class WorldAssetRenderModel extends Equatable {
   final Scene scene;
 
   late final double order;
+  late final bool shouldRender;
   late final Matrix4 transformation;
 
   WorldAssetRenderModel(this.camera, this.asset, Size screenSize)
@@ -30,14 +31,15 @@ class WorldAssetRenderModel extends Equatable {
     final double rotateYAdjustment = rotationYAdjustment(camera, asset, preRotationPosition);
     final Vector3 adjustedPosition = postRotationPositionAdjustment(asset, camera.positionVector, rotateYAdjustment, preRotationPosition);
     order = camera.positionVector.distanceTo(adjustedPosition);
+    shouldRender = calculateShouldRender(camera.positionVector, camera.lookAtVector, adjustedPosition);
     final rotation = Quaternion.axisAngle(Quaternion.axisAngle(yAxis, -rotateYAdjustment).rotated(zAxis), asset.rotateZ) * Quaternion.axisAngle(Quaternion.axisAngle(yAxis, -rotateYAdjustment).rotated(xAxis), asset.rotateX) * Quaternion.axisAngle(yAxis, rotateYAdjustment + asset.rotateY);
     final modelMatrix = Matrix4.compose(adjustedPosition, rotation, Vector3.all(asset.scale));
     transformation = PointerEvent.removePerspectiveTransform(
-        scene.toFlutterCoords *
+        scene.toFlutterCoordinates *
             camera.cameraMatrix *
             modelMatrix *
             asset.toTranslateToCenterMatrix *
-            scene.toOpenGlCoords
+            scene.toOpenGlCoordinates
     );
   }
 
@@ -78,6 +80,13 @@ class WorldAssetRenderModel extends Equatable {
     } else {
       return assetPosition;
     }
+  }
+
+  static bool calculateShouldRender(Vector3 cameraPosition, Vector3 lookAtPosition, Vector3 modelPosition) {
+    final modelVector = (modelPosition - cameraPosition)..normalize();
+    final cameraDirectionVector = (lookAtPosition - cameraPosition)..normalize();
+
+    return cameraDirectionVector.dot(modelVector) > 0;
   }
 
 }

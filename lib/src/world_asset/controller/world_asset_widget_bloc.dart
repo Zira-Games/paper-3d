@@ -6,7 +6,7 @@ import 'package:paper_3d/src/paper_world/controller/paper_world_bloc.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:state_machine_animation/state_machine_animation.dart';
 
-import '../../util/blocToSubject.dart';
+import '../../util/bloc_to_subject.dart';
 import '../animation/default_asset_animation_state_machine.dart';
 import '../animation/default_asset_animation.dart';
 import '../animation/world_asset_model.dart';

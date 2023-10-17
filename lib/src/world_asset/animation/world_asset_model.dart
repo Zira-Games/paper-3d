@@ -3,7 +3,7 @@ import 'dart:ui';
 import 'package:state_machine_animation/state_machine_animation.dart';
 import 'package:vector_math/vector_math_64.dart';
 
-import '../../svg-shape-border.dart';
+import '../../svg_shape_border.dart';
 import '../../util/screen_size.dart';
 
 abstract class WorldAssetModel extends AnimationModel {
@@ -43,7 +43,7 @@ abstract class WorldAssetModel extends AnimationModel {
       this.looksAtTheCamera = false,
       this.effectivePositionDistance = 0
     }){
-    assert(!(followsTheCamera && looksAtTheCamera), "Can't be sticky and staring at the same time");
+    assert(!(followsTheCamera && looksAtTheCamera), "Can't follow and look at the camera at the same time");
     /*
     // so that we can provider rotation independent position
     if( rotateX != 0 || rotateY != 0 || rotateZ != 0){

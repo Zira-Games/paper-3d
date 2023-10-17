@@ -18,7 +18,7 @@ class WorldAssetInternal extends StatelessWidget {
       onData: (distance) => context.read<WorldAsset>().controller.add(UpdateCameraDistance(distance)), // just update the order in world bloc
       child: BehaviorSubjectBuilder<WorldAssetRenderModel>(
         subject: context.read<BehaviorSubject<WorldAssetRenderModel>>(),
-        subjectBuilder: (context, model) => Positioned(
+        subjectBuilder: (context, model) => model.shouldRender ? Positioned(
             // Scene is bigger than the screen, so we move the container, to align their centers
           left: -(model.scene.size.width - model.scene.screenSize.width) / 2,
           top: -(model.scene.size.height - model.scene.screenSize.height) / 2,
@@ -34,7 +34,7 @@ class WorldAssetInternal extends StatelessWidget {
               child: context.read<WorldAsset>().child
             )
           )
-        )
+        ) : const SizedBox()
       )
     );
   }
