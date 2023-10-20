@@ -5,7 +5,7 @@ import 'package:rxdart/rxdart.dart';
 import 'package:state_machine_animation/state_machine_animation.dart';
 import '../controller/world_asset_widget_bloc.dart';
 import '../world_asset.dart';
-import 'world_asset_render_model.dart';
+import 'world_asset_internal_state.dart';
 
 class WorldAssetInternal extends StatelessWidget {
 
@@ -14,23 +14,22 @@ class WorldAssetInternal extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StreamListener<double>(
-      stream: context.read<BehaviorSubject<WorldAssetRenderModel>>().map((model) => model.order).distinct(),
+      stream: context.read<BehaviorSubject<WorldAssetInternalState>>().map((model) => model.order).distinct(),
       onData: (distance) => context.read<WorldAsset>().controller.add(UpdateCameraDistance(distance)), // just update the order in world bloc
-      child: BehaviorSubjectBuilder<WorldAssetRenderModel>(
-        subject: context.read<BehaviorSubject<WorldAssetRenderModel>>(),
-        subjectBuilder: (context, model) => model.shouldRender ? Positioned(
-            // Scene is bigger than the screen, so we move the container, to align their centers
-          left: -(model.scene.size.width - model.scene.screenSize.width) / 2,
-          top: -(model.scene.size.height - model.scene.screenSize.height) / 2,
+      child: BehaviorSubjectBuilder<WorldAssetInternalState>(
+        subject: context.read<BehaviorSubject<WorldAssetInternalState>>(),
+        subjectBuilder: (context, state) => state.shouldRender ? Positioned(
+          left: state.left,
+          top: state.top,
           child: Transform(
-            transform: model.transformation,
+            transform: state.transformation,
             child: Container(
-              clipBehavior: model.asset.customBorder != null ? Clip.hardEdge : Clip.none,
-              decoration: model.asset.customBorder != null
-                  ? ShapeDecoration(shape: model.asset.customBorder!)
+              clipBehavior: state.customBorder != null ? Clip.hardEdge : Clip.none,
+              decoration: state.customBorder != null
+                  ? ShapeDecoration(shape: state.customBorder!)
                   : null, //BoxDecoration(border: Border.all(color: const Color.fromRGBO(255, 0, 0, 1), width: 1)),
-              width: (model.asset.size ?? model.scene.screenSize).width,
-              height: (model.asset.size ?? model.scene.screenSize).height,
+              width: state.width,
+              height: state.height,
               child: context.read<WorldAsset>().child
             )
           )

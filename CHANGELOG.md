@@ -1,3 +1,12 @@
+## 1.0.13
+
+- Moved things around for more clarity. I probably broke some stuff.
+
+
+## 1.0.12
+
+- Check behind camera with all four spots.
+
 ## 1.0.11
 
 - Don't render models if they are behind the camera

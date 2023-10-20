@@ -2,13 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 import 'package:rxdart/rxdart.dart';
-import 'package:state_machine_animation/state_machine_animation.dart';
 
-import '../base_camera_model.dart';
-import '../world_asset/animation/world_asset_model.dart';
+import '../3d-utils/base_camera_model.dart';
 import '../world_asset/world_asset.dart';
 import '../world_asset/world_asset_internal/world_asset_internal.dart';
-import '../world_asset/world_asset_internal/world_asset_render_model.dart';
+import '../world_asset/world_asset_internal/world_asset_internal_state.dart';
 import 'controller/paper_world_bloc.dart';
 
 class PaperWorldWidget extends StatelessWidget {
@@ -24,8 +22,8 @@ class PaperWorldWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        BlocProvider<PaperWorldBloc>(create: (context) => PaperWorldBloc(assets)),
-        Provider<BehaviorSubject<CameraModel>>.value(value: camera)
+        Provider<BehaviorSubject<CameraModel>>.value(value: camera),
+        BlocProvider<PaperWorldBloc>(create: (context) => PaperWorldBloc(assets, camera, screen))
       ],
       child: BlocBuilder<PaperWorldBloc, GameWorldState>(
         builder: (context, state) => state is GameWorldReady
@@ -34,18 +32,11 @@ class PaperWorldWidget extends StatelessWidget {
             height: MediaQuery.of(context).size.height,
             width: MediaQuery.of(context).size.width,
             child: Stack(
-              children: state.assetIds.map((assetId) => MultiProvider(
-                key: Key(assetId),
+              children: state.orderedPairs.map((pair) => MultiProvider(
+                key: Key(pair.id),
                 providers: [
-                  Provider<WorldAsset>.value(value: state.allAssets.firstWhere((a) => a.id == assetId)),
-                  Provider<BehaviorSubject<WorldAssetRenderModel>>(
-                    create: (context) => combineSubject3<WorldAssetModel, CameraModel, Size, WorldAssetRenderModel>(
-                      context.read<WorldAsset>().controller.animation,
-                      camera,
-                      screen,
-                      (model, camera, screenSize) => WorldAssetRenderModel(camera, model, screenSize)
-                    )
-                  )
+                  Provider<WorldAsset>.value(value: pair.worldAsset),
+                  Provider<BehaviorSubject<WorldAssetInternalState>>.value(value: pair.worldAssetStateStream)
                 ],
                 child: const WorldAssetInternal()
               )).toList()

@@ -1,8 +1,14 @@
 import 'dart:async';
+import 'dart:ui';
 
 import 'package:bloc/bloc.dart';
 import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
+import 'package:paper_3d/src/3d-utils/base_camera_model.dart';
+import 'package:paper_3d/src/world_asset/animation/world_asset_model.dart';
+import 'package:paper_3d/src/world_asset/world_asset_internal/world_asset_internal_state.dart';
+import 'package:rxdart/subjects.dart';
+import 'package:state_machine_animation/state_machine_animation.dart';
 
 import '../../world_asset/controller/world_asset_widget_bloc.dart';
 import '../../world_asset/world_asset.dart';
@@ -12,13 +18,15 @@ part 'paper_world_state.dart';
 
 class PaperWorldBloc extends Bloc<GameWorldEvent, GameWorldState> {
 
-  static getInitialState(List<WorldAsset> assets) => {
+  static getInitialLoadedOrders(List<WorldAsset> assets) => {
     for(final asset in assets)
       if( asset.controller.state is WorldAssetLoaded )
         asset.id: asset.controller.state.order,
   };
 
-  PaperWorldBloc(List<WorldAsset> assets) : super(GameWorldState(assets, getInitialState(assets))) {
+  PaperWorldBloc(List<WorldAsset> assets, BehaviorSubject<CameraModel> camera, BehaviorSubject<Size> screen)
+      : super(GameWorldState(assets, getInitialLoadedOrders(assets), camera, screen)) {
+
     for( final asset in assets ){
       asset.controller.paperWorld = this;
     }

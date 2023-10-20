@@ -3,7 +3,7 @@ import 'dart:ui';
 import 'package:state_machine_animation/state_machine_animation.dart';
 import 'package:vector_math/vector_math_64.dart';
 
-import '../../svg_shape_border.dart';
+import 'svg_shape_border.dart';
 import '../../util/screen_size.dart';
 
 abstract class WorldAssetModel extends AnimationModel {

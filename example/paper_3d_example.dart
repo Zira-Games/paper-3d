@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:paper_3d/src/base_camera_model.dart';
+import 'package:paper_3d/src/3d-utils/base_camera_model.dart';
 import 'package:paper_3d/src/paper_world/paper_world_widget.dart';
 import 'package:paper_3d/src/util/screen_size.dart';
 import 'package:paper_3d/src/world_asset/animation/world_asset_model.dart';
