@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:paper_3d/src/paper_world/world_asset_contents.dart';
+import 'package:paper_3d/src/world_asset/animation/world_asset_model.dart';
+import 'package:paper_3d/src/world_asset/world_asset_internal/world_asset_internal_state.dart';
 import 'package:provider/provider.dart';
 import 'package:rxdart/rxdart.dart';
+import 'package:state_machine_animation/state_machine_animation.dart';
 
 import '../3d-utils/base_camera_model.dart';
 import '../world_asset/world_asset.dart';
 import '../world_asset/world_asset_internal/world_asset_internal.dart';
-import '../world_asset/world_asset_internal/world_asset_internal_state.dart';
 import 'controller/paper_world_bloc.dart';
 
 class PaperWorldWidget extends StatelessWidget {
@@ -20,11 +23,8 @@ class PaperWorldWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [
-        Provider<BehaviorSubject<CameraModel>>.value(value: camera),
-        BlocProvider<PaperWorldBloc>(create: (context) => PaperWorldBloc(assets, camera, screen))
-      ],
+    return BlocProvider<PaperWorldBloc>(
+      create: (context) => PaperWorldBloc(assets),
       child: BlocBuilder<PaperWorldBloc, GameWorldState>(
         builder: (context, state) => state is GameWorldReady
           ? Container(
@@ -32,13 +32,16 @@ class PaperWorldWidget extends StatelessWidget {
             height: MediaQuery.of(context).size.height,
             width: MediaQuery.of(context).size.width,
             child: Stack(
-              children: state.orderedPairs.map((pair) => MultiProvider(
-                key: Key(pair.id),
-                providers: [
-                  Provider<WorldAsset>.value(value: pair.worldAsset),
-                  Provider<BehaviorSubject<WorldAssetInternalState>>.value(value: pair.worldAssetStateStream)
-                ],
-                child: const WorldAssetInternal()
+              children: state.orderedAssets.map((asset) => Provider<WorldAssetContents>(
+                create: (context) => WorldAssetContents(asset, combineSubject3<WorldAssetModel, CameraModel, Size, WorldAssetInternalState>(
+                  asset.controller.animation,
+                  camera,
+                  screen,
+                  (model, camera, screenSize) => WorldAssetInternalState(camera, model, screenSize)
+                )),
+                dispose: (context, value) => value.dispose(),
+                key: Key(asset.id),
+                child: const WorldAssetInternal(),
               )).toList()
             )
           ) : SizedBox()

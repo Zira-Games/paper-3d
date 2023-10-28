@@ -24,8 +24,8 @@ class PaperWorldBloc extends Bloc<GameWorldEvent, GameWorldState> {
         asset.id: asset.controller.state.order,
   };
 
-  PaperWorldBloc(List<WorldAsset> assets, BehaviorSubject<CameraModel> camera, BehaviorSubject<Size> screen)
-      : super(GameWorldState(assets, getInitialLoadedOrders(assets), camera, screen)) {
+  PaperWorldBloc(List<WorldAsset> assets)
+      : super(GameWorldState(assets, getInitialLoadedOrders(assets))) {
 
     for( final asset in assets ){
       asset.controller.paperWorld = this;

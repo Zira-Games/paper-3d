@@ -1,6 +1,5 @@
 import 'dart:math';
 
-import 'package:flutter/rendering.dart';
 import 'package:paper_3d/src/3d-utils/base_camera_model.dart';
 import 'package:vector_math/vector_math_64.dart';
 

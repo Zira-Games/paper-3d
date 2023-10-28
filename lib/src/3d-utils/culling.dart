@@ -1,25 +1,41 @@
-// https://bruop.github.io/frustum_culling/
+// https://bruop.github.io/frustum_culling/ if we're doing it manually
 
-import 'package:flutter/cupertino.dart';
+import 'package:paper_3d/paper_3d.dart';
 import 'package:vector_math/vector_math_64.dart';
+import 'package:three_dart/three3d/geometries/box_geometry.dart' as three;
+import 'package:three_dart/three3d/cameras/perspective_camera.dart' as three;
+import 'package:three_dart/three3d/math/frustum.dart' as three;
+import 'package:three_dart/three3d/math/matrix4.dart' as three;
+import 'package:three_dart/three3d/math/vector3.dart' as three;
+import 'package:three_dart/three3d/scenes/scene.dart' as three;
+import 'package:three_dart/three3d/materials/mesh_basic_material.dart' as three;
+import 'package:three_dart/three3d/math/box3.dart' as three;
+import 'package:three_dart/three3d/objects/mesh.dart' as three;
 
-bool shouldCull(Matrix4 viewMatrix, Matrix4 modelTransformation, Aabb3 aabb)
-{
-    return false;
+
+bool threeJsCulling(CameraModel cameraModel, Scene scene, WorldAssetModel assetModel, Matrix4 modelMatrix){
+    final threeScene = three.Scene();
+    final threeCamera = three.PerspectiveCamera(90, CameraModel.aspectRatio,  0.001, 1000);
+    threeCamera.position = three.Vector3(cameraModel.positionVector.x, cameraModel.positionVector.y, cameraModel.positionVector.z);
+    threeCamera.lookAt(three.Vector3(cameraModel.lookAtVector.x, cameraModel.lookAtVector.y, cameraModel.lookAtVector.z));
+    threeCamera.up = three.Vector3(cameraModel.upVector.x, cameraModel.upVector.y, cameraModel.upVector.z);
+    threeCamera.updateMatrix();
+    threeCamera.updateMatrixWorld();
+    threeScene.add(threeCamera);
+
+    final width = scene.widthToGL(assetModel.size!.width);
+    final height = scene.heightToGL(assetModel.size!.height);
+    final translation = Vector3.zero();
+    modelMatrix.decompose(translation, Quaternion.identity(), Vector3.zero());
+    final mesh = three.Mesh(three.BoxGeometry(width, height, 0.01), three.MeshBasicMaterial());
+    mesh.position.set(translation.x, translation.y, translation.z);
+    mesh.rotation.set(assetModel.rotateX, assetModel.rotateY, assetModel.rotateZ, 'YXZ');
+    mesh.scale.set(assetModel.scale, assetModel.scale, assetModel.scale);
+    mesh.updateMatrixWorld();
+    threeScene.add(mesh);
+
+    final frustum = three.Frustum();
+    frustum.setFromProjectionMatrix(three.Matrix4().multiplyMatrices(threeCamera.projectionMatrix, threeCamera.matrixWorldInverse));
+    final threeBox = three.Box3().setFromObject(mesh);
+    return !frustum.intersectsBox(threeBox);
 }
-
-/*
-    final width = scene.widthToGL(asset.size?.width ?? 0) * asset.scale;
-    final height = scene.heightToGL(asset.size?.height ?? 0) * asset.scale /2;
-    // TODO dividing by two is a stop gap solution, there is something wrong with this calculation but I don't know what.
-    final topLeft = Vector3(- width / 2, height / 2, 0) / 2;
-    final topRight = Vector3(width / 2, height / 2, 0) / 2;
-    final bottomLeft = Vector3(- width / 2, - height / 2, 0)  / 2;
-    final bottomRight = Vector3(width / 2, - height / 2, 0) / 2;
-
-    final corner1 = rotation.rotated(topLeft) + asset.position;
-    final corner2 = rotation.rotated(topRight) + asset.position;
-    final corner3 = rotation.rotated(bottomLeft) + asset.position;
-    final corner4 = rotation.rotated(bottomRight) + asset.position;
-
- */

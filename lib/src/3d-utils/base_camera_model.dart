@@ -20,17 +20,18 @@ abstract class CameraModel extends AnimationModel {
 
   final Vector3 positionVector;
   final Vector3 lookAtVector;
-  final Vector3? upVector;
+  late final Vector3 upVector;
 
   final Matrix4 perspectiveMatrix;
   final Matrix4 viewMatrix;
 
   late final Matrix4 cameraMatrix;
 
-  CameraModel(this.positionVector, this.lookAtVector, [this.upVector]) :
+  CameraModel(this.positionVector, this.lookAtVector, [Vector3? upVector]) :
         perspectiveMatrix = makePerspectiveMatrix(fovYRadians, aspectRatio, 0, positionVector.distanceTo(lookAtVector) * 20),
         viewMatrix = makeViewMatrix(positionVector, lookAtVector, upVector ?? defaultUpVector){
     cameraMatrix = perspectiveMatrix * viewMatrix;
+    this.upVector = upVector ?? defaultUpVector;
   }
 
   @override List<Object?> get props => [positionVector, lookAtVector, cameraMatrix];

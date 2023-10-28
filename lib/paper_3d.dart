@@ -15,3 +15,4 @@ export 'src/world_asset/animation/world_asset_model.dart';
 export 'src/3d-utils/base_camera_model.dart';
 export 'src/3d-utils/scene.dart';
 export 'src/world_asset/animation/svg_shape_border.dart';
+export 'src/paper_world/world_asset_contents.dart';

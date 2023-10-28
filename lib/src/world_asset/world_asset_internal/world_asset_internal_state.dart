@@ -2,13 +2,12 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/rendering.dart';
 import 'package:paper_3d/paper_3d.dart';
 import 'package:paper_3d/src/3d-utils/culling.dart';
-import 'package:paper_3d/src/3d-utils/world_asset_aabb3.dart';
 import 'package:paper_3d/src/3d-utils/world_asset_model_transformation.dart';
 
 class WorldAssetInternalState extends Equatable {
 
-  late final double order;
   late final bool shouldRender;
+  late final double order;
   late final Matrix4 transformation;
   late final SvgShapeBorder? customBorder;
 
@@ -20,9 +19,8 @@ class WorldAssetInternalState extends Equatable {
   WorldAssetInternalState(CameraModel camera, WorldAssetModel asset, Size screenSize) {
     final scene = Scene(screenSize, screenSize.square);
     final modelMatrix = getModelTransformation(camera, asset);
-    final assetAabb = getAabb3FromWorldAsset(asset, modelMatrix.getRotation(), scene);
 
-    shouldRender = !shouldCull(camera.viewMatrix, modelMatrix, assetAabb);
+    shouldRender = !threeJsCulling(camera, scene, asset, modelMatrix);
     customBorder = asset.customBorder;
     order = camera.positionVector.distanceTo(modelMatrix.getTranslation());
 

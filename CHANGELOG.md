@@ -1,7 +1,34 @@
+## 1.1.2
+
+- three.js culling is now working
+
+## 1.1.1
+
+- flutter_gl added
+
+## 1.1.0
+
+- three.js port frustum culling experiment 
+
+## 1.0.18
+
+- Naming changes
+
+## 1.0.16
+
+- Naming changes
+
+## 1.0.15
+
+- .
+
+## 1.0.14
+
+- Attempts at fixing broken stuff. Will experiment with the three.js dart port instead of native calculations.
+
 ## 1.0.13
 
 - Moved things around for more clarity. I probably broke some stuff.
-
 
 ## 1.0.12
 
