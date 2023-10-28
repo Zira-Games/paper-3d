@@ -31,7 +31,7 @@ class WorldAssetInternalState extends Equatable {
     width = (asset.size ?? scene.screenSize).width;
     height = (asset.size ?? scene.screenSize).height;
 
-    final mvp = camera.cameraMatrix * modelMatrix;
+    final mvp = camera.cameraMatrix * modelMatrix * asset.toTranslateToCenterMatrix;
     transformation = scene.coordinateConversion(mvp);
   }
 

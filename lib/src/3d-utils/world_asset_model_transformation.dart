@@ -18,8 +18,7 @@ Matrix4 getModelTransformation(CameraModel camera, WorldAssetModel asset){
   final rotation = Quaternion.axisAngle(Quaternion.axisAngle(yAxis, -rotateYAdjustment).rotated(zAxis), asset.rotateZ)
       * Quaternion.axisAngle(Quaternion.axisAngle(yAxis, -rotateYAdjustment).rotated(xAxis), asset.rotateX)
       * Quaternion.axisAngle(yAxis, rotateYAdjustment + asset.rotateY);
-  final composed = Matrix4.compose(adjustedPosition, rotation, Vector3.all(asset.scale));
-  return composed * asset.toTranslateToCenterMatrix;
+  return Matrix4.compose(adjustedPosition, rotation, Vector3.all(asset.scale));
 }
 
 double rotationYAdjustment(CameraModel camera, WorldAssetModel asset, Vector3 assetPosition){

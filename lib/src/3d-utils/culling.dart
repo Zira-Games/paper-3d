@@ -12,7 +12,6 @@ import 'package:three_dart/three3d/materials/mesh_basic_material.dart' as three;
 import 'package:three_dart/three3d/math/box3.dart' as three;
 import 'package:three_dart/three3d/objects/mesh.dart' as three;
 
-
 bool threeJsCulling(CameraModel cameraModel, Scene scene, WorldAssetModel assetModel, Matrix4 modelMatrix){
     final threeScene = three.Scene();
     final threeCamera = three.PerspectiveCamera(90, CameraModel.aspectRatio,  0.001, 1000);
