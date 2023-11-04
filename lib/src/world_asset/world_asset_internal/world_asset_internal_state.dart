@@ -1,8 +1,10 @@
+import 'dart:ui';
+
 import 'package:equatable/equatable.dart';
-import 'package:flutter/rendering.dart';
 import 'package:paper_3d/paper_3d.dart';
 import 'package:paper_3d/src/3d-utils/culling.dart';
 import 'package:paper_3d/src/3d-utils/world_asset_model_transformation.dart';
+import 'package:vector_math/vector_math_64.dart';
 
 class WorldAssetInternalState extends Equatable {
 
@@ -22,7 +24,7 @@ class WorldAssetInternalState extends Equatable {
 
     shouldRender = !threeJsCulling(camera, scene, asset, modelMatrix);
     customBorder = asset.customBorder;
-    order = camera.positionVector.distanceTo(modelMatrix.getTranslation());
+    order = camera.positionVector.xz.distanceTo(modelMatrix.getTranslation().xz);
 
     // Scene is bigger than the screen, so we move the container, to align their centers
     left = -(scene.size.width - scene.screenSize.width) / 2;

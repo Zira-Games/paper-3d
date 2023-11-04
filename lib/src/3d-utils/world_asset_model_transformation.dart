@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:paper_3d/src/3d-utils/base_camera_model.dart';
+import 'package:paper_3d/src/util/three_to_vector_math.dart';
 import 'package:vector_math/vector_math_64.dart';
 
 import '../world_asset/animation/world_asset_model.dart';
@@ -31,12 +32,7 @@ double rotationYAdjustment(CameraModel camera, WorldAssetModel asset, Vector3 as
   }
 }
 
-double angleBetween(Vector3 cameraPosition, Vector3 modelPosition){
-  final modelPositionOnCameraPlane = (modelPosition - cameraPosition)..normalize();
-  final angle = modelPositionOnCameraPlane.z != 0.0 ? atan(modelPositionOnCameraPlane.x / modelPositionOnCameraPlane.z) : 0.0;
-  final zFlip = (modelPosition - cameraPosition).z > 0;
-  return angle.isNaN ? 0 : angle + ((zFlip ? pi : 0));
-}
+double angleBetween(Vector3 cameraPosition, Vector3 modelPosition) => vectorToThree(cameraPosition).angleTo(vectorToThree(modelPosition));
 
 double cameraAngle(CameraModel camera) => angleBetween(camera.positionVector, camera.lookAtVector);
 

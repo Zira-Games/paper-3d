@@ -1,3 +1,11 @@
+## 1.1.4
+
+- object orders are now calculated by on floor distance.
+
+## 1.1.3
+
+- culling is now applied before translation adjustment
+
 ## 1.1.2
 
 - three.js culling is now working
