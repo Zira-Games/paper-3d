@@ -1,20 +1,15 @@
 import 'package:flutter/cupertino.dart';
+import 'package:rxdart/subjects.dart';
 
-import 'controller/world_asset_widget_bloc.dart';
 import 'animation/world_asset_model.dart';
 
-class WorldAsset<C extends WorldAssetController<M>, M extends WorldAssetModel> {
+class WorldAsset<M extends WorldAssetModel> {
 
-  String get id => controller.initialModel.id;
+  String get id => animation.value.id;
 
-  final C controller;
+  final BehaviorSubject<M> animation;
   final StatelessWidget child;
 
-  WorldAsset({required this.controller, required this.child});
-
-  dispose(){
-    controller.paperWorld = null;
-    controller.close();
-  }
+  WorldAsset({required this.animation, required this.child});
 
 }

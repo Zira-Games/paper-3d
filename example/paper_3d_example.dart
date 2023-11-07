@@ -3,8 +3,9 @@ import 'package:flutter/scheduler.dart';
 import 'package:paper_3d/src/3d-utils/base_camera_model.dart';
 import 'package:paper_3d/src/paper_world/paper_world_widget.dart';
 import 'package:paper_3d/src/util/screen_size.dart';
+import 'package:paper_3d/src/world_asset/animation/default_asset_animation.dart';
+import 'package:paper_3d/src/world_asset/animation/default_asset_animation_state_machine.dart';
 import 'package:paper_3d/src/world_asset/animation/world_asset_model.dart';
-import 'package:paper_3d/src/world_asset/controller/world_asset_widget_bloc.dart';
 import 'package:paper_3d/src/world_asset/world_asset.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:state_machine_animation/state_machine_animation.dart';
@@ -32,7 +33,7 @@ class World extends StatelessWidget {
       camera: cameraSubject,
       screen: screenSubject,
       assets: [
-        AwesomeAsset(Uuid().v4(), screenSize, tickerManager)
+        AwesomeAsset(Uuid().v4(), screenSize, cameraSubject, tickerManager)
       ]
     );
   }
@@ -53,8 +54,8 @@ class AwesomeCameraModel extends CameraModel {
 
 class AwesomeAsset extends WorldAsset {
 
-  AwesomeAsset(String id, ScreenSize screenSize, TickerManager tickerManager) : super(
-    controller: DefaultAssetController<AwesomeAssetModel>(AwesomeAssetModel(id, screenSize), tickerManager),
+  AwesomeAsset(String id, ScreenSize screenSize, BehaviorSubject<AwesomeCameraModel> sourceSubject, TickerManager tickerManager) : super(
+    animation: DefaultAssetAnimation<AwesomeAssetModel>(DefaultAssetAnimationStateMachine(sourceSubject, tickerManager), AwesomeAssetModel(id, screenSize)).output,
     child: Container(color: Color(0xFF000000))
   );
 

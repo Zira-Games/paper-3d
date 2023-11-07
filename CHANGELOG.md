@@ -1,3 +1,11 @@
+## 1.2
+
+- Internal Overhaul
+
+## 1.1.5
+
+- rotation bug
+
 ## 1.1.4
 
 - object orders are now calculated by on floor distance.

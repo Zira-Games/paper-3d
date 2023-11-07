@@ -9,9 +9,9 @@ class WorldAssetContents extends Equatable {
   final BehaviorSubject<WorldAssetInternalState> worldAssetStateStream;
 
   const WorldAssetContents(
-      this.worldAsset,
-      this.worldAssetStateStream
-      );
+    this.worldAsset,
+    this.worldAssetStateStream
+  );
 
   @override List<Object> get props => [worldAsset, worldAssetStateStream];
 
