@@ -1,4 +1,8 @@
-## 1.2
+## 1.2.1
+
+- Added a default getDefaultAnimation function helper
+
+## 1.2.0
 
 - Internal Overhaul
 
