@@ -1,3 +1,27 @@
+## 1.2.7
+
+- cstom three version.
+
+## 1.2.6
+
+- dart version option.
+
+## 1.2.5
+
+- dart version up.
+
+## 1.2.4
+
+- old streams are now closed.
+
+## 1.2.3
+
+- paper world stream optimization.
+
+## 1.2.2
+
+- Initial value for subject and order fixed for the paper world state.
+
 ## 1.2.1
 
 - Added a default getDefaultAnimation function helper

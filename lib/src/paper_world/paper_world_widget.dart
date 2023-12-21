@@ -1,4 +1,6 @@
-import 'package:collection/collection.dart';
+import 'dart:collection';
+
+import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:paper_3d/src/world_asset/world_asset_contents.dart';
 import 'package:paper_3d/src/world_asset/animation/world_asset_model.dart';
@@ -28,28 +30,30 @@ class PaperWorldWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BehaviorSubjectBuilder<List<WorldAssetContents>>(
-      subject: getPaperWorldStateStream(assets, camera, screen),
-      subjectBuilder: (context, state) => Container(
-        color: background ?? Colors.white,
-        height: MediaQuery.of(context).size.height,
-        width: MediaQuery.of(context).size.width,
-        child: Stack(
-          children: state.map((asset) => Provider<WorldAssetContents>.value(
-            value: asset,
-            key: Key(asset.id),
-            child: const WorldAssetInternal()
-          )).toList()
-        )
+    return Provider<BehaviorSubject<PaperWorldState>>(
+      create: (context) => getPaperWorldStateSubject(assets, camera, screen),
+      dispose: (context, value) => value.close(),
+      builder: (context, child) => BehaviorSubjectBuilder<PaperWorldState>(
+          subject: context.read<BehaviorSubject<PaperWorldState>>(),
+          subjectBuilder: (context, state) => Container(
+              color: background ?? Colors.white,
+              height: MediaQuery.of(context).size.height,
+              width: MediaQuery.of(context).size.width,
+              child: Stack(
+                  children: state.elements.map((asset) => Provider<WorldAssetContents>.value(
+                      value: asset,
+                      key: Key(asset.id),
+                      child: const WorldAssetInternal()
+                  )).toList()
+              )
+          )
       )
     );
   }
 }
 
-BehaviorSubject<List<WorldAssetContents>> getPaperWorldStateStream(List<WorldAsset> assets, BehaviorSubject<CameraModel> camera, BehaviorSubject<Size> screen){
-
-  // TODO split the two map functions and use the first variable to create the seed value for the final behaviour subject
-  final assetContentsAndOrderStreams = assets
+BehaviorSubject<PaperWorldState> getPaperWorldStateSubject(List<WorldAsset> assets, BehaviorSubject<CameraModel> camera, BehaviorSubject<Size> screen){
+  final contents = assets
       .map((a) =>
       WorldAssetContents(
           a,
@@ -57,17 +61,43 @@ BehaviorSubject<List<WorldAssetContents>> getPaperWorldStateStream(List<WorldAss
               a.animation,
               camera,
               screen,
-                  (model, camera, screenSize) => WorldAssetInternalState(camera, model, screenSize)
+              (model, camera, screenSize) => WorldAssetInternalState(camera, model, screenSize)
           )
       )
-  ).map((wac) =>
-      wac.worldAssetStateStream.map<double>((state) => state.order).distinctUnique().map((order) => (order, wac))
   );
 
-  final stream =  Rx.combineLatest<(double, WorldAssetContents), List<WorldAssetContents>>(
-    assetContentsAndOrderStreams,
-    (values) => values.sorted((a, b) => a.$1.compareTo(b.$1)).map((e) => e.$2).toList()
+  final assetContentsAndOrderStreams = contents.map((wac) =>
+      wac.worldAssetStateStream
+          .map<double>((state) => wac.worldAsset.animation.value.permanentOrder ?? state.order)
+          .distinctUnique()
+          .map((order) => (order, wac))
   );
+  final stream = Rx.combineLatest<(double, WorldAssetContents), PaperWorldState>(
+      assetContentsAndOrderStreams,
+      (values) => PaperWorldState(SplayTreeSet<(double, WorldAssetContents)>.of(values, (a, b) => b.$1.compareTo(a.$1)).map((element) => element.$2).toList())
+  ).distinctUnique();
 
-  return BehaviorSubject<List<WorldAssetContents>>()..addStream(stream);
+  final seed = PaperWorldState(SplayTreeSet<(double, WorldAssetContents)>.of(contents.map((wac) => (wac.worldAsset.animation.value.permanentOrder ?? wac.worldAssetStateStream.value.order, wac)), (a, b) => b.$1.compareTo(a.$1)).map((e) => e.$2).toList());
+
+  return BehaviorSubject<PaperWorldState>.seeded(seed)..addStream(stream);
+}
+
+class PaperWorldState extends Equatable {
+
+  final List<WorldAssetContents> elements;
+
+  const PaperWorldState(this.elements);
+
+  @override List<Object?> get props => [elements];
+
+  @override
+  bool operator ==(Object other) =>
+      other is PaperWorldState &&
+          other.runtimeType == runtimeType &&
+          other.elements.length == elements.length &&
+          other.elements.map((e) => e.worldAsset.id).join(",") == elements.map((e) => e.worldAsset.id).join(",");
+
+  @override
+  int get hashCode => elements.map((e) => e.worldAsset.id).join(",").hashCode;
+
 }
